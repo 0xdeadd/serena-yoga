@@ -1,10 +1,10 @@
-const { getSQL, ensureDb, checkAdmin } = require('../_db');
+const { getDb, checkAdmin } = require('../_db');
 
 module.exports = async function handler(req, res) {
-  await ensureDb();
   if (!(await checkAdmin(req))) return res.status(401).json({ error: 'Unauthorized' });
 
-  const sql = getSQL();
-  const result = await sql`SELECT * FROM messages ORDER BY sent_at DESC LIMIT 50`;
-  res.json(result);
+  const db = getDb();
+  const { data, error } = await db.from('messages').select('*').order('sent_at', { ascending: false }).limit(50);
+  if (error) return res.status(500).json({ error: error.message });
+  res.json(data);
 };
