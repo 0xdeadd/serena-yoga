@@ -1,23 +1,24 @@
-const { getSQL, ensureDb } = require('./_db');
+const { getDb } = require('./_db');
 
 module.exports = async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
-  await ensureDb();
-  const sql = getSQL();
+  const db = getDb();
   const { name, email } = req.body;
   if (!name || !email) return res.status(400).json({ error: 'Name and email are required' });
 
-  const existing = await sql`SELECT id, subscribed FROM students WHERE email = ${email}`;
+  const { data: existing } = await db.from('students').select('id, subscribed').eq('email', email).maybeSingle();
 
-  if (existing.length > 0) {
-    if (!existing[0].subscribed) {
-      await sql`UPDATE students SET subscribed = true, name = ${name} WHERE email = ${email}`;
+  if (existing) {
+    if (!existing.subscribed) {
+      await db.from('students').update({ subscribed: true, name }).eq('email', email);
       return res.json({ message: 'Welcome back! You have been re-subscribed.' });
     }
     return res.json({ message: 'You are already subscribed!' });
   }
 
-  await sql`INSERT INTO students (name, email) VALUES (${name}, ${email})`;
+  const { error } = await db.from('students').insert({ name, email });
+  if (error) return res.status(500).json({ error: 'Something went wrong' });
+
   res.json({ message: 'Welcome! You are now subscribed to updates.' });
 };

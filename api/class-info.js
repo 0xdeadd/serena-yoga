@@ -1,11 +1,12 @@
-const { getSQL, ensureDb } = require('./_db');
+const { getDb } = require('./_db');
 
 module.exports = async function handler(req, res) {
-  await ensureDb();
-  const sql = getSQL();
-  const result = await sql`SELECT key, value FROM settings`;
+  const db = getDb();
+  const { data, error } = await db.from('settings').select('key, value');
+  if (error) return res.status(500).json({ error: error.message });
+
   const settings = {};
-  result.forEach(r => settings[r.key] = r.value);
+  data.forEach(r => settings[r.key] = r.value);
   delete settings.admin_password;
   res.json(settings);
 };

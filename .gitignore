@@ -2,4 +2,5 @@ node_modules/
 .vercel/
 .env
 .env.local
-serena_yoga.db
+serena_yoga.db*
+.vercel
