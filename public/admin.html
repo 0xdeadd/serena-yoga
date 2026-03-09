@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Serena's Yoga - Admin</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --sage: #87A878;
+      --sage-light: #B5C9A8;
+      --sage-dark: #5C7A4E;
+      --cream: #FAF8F0;
+      --warm: #E8DFD0;
+      --text: #3A3A3A;
+      --text-light: #6B6B6B;
+    }
+
+    body {
+      font-family: 'Georgia', 'Times New Roman', serif;
+      background: var(--cream);
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    header {
+      background: linear-gradient(135deg, var(--sage-dark), var(--sage));
+      color: white;
+      text-align: center;
+      padding: 2rem 1rem;
+    }
+
+    header h1 { font-size: 1.8rem; font-weight: 300; letter-spacing: 2px; }
+    header p { font-size: 0.9rem; opacity: 0.8; }
+
+    /* Login screen */
+    #loginScreen {
+      max-width: 400px;
+      margin: 4rem auto;
+      padding: 0 1rem;
+    }
+
+    #adminPanel { display: none; }
+
+    .card {
+      background: white;
+      border-radius: 12px;
+      padding: 2rem;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    }
+
+    .card h2 {
+      font-size: 1.3rem;
+      font-weight: 400;
+      color: var(--sage-dark);
+      margin-bottom: 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--warm);
+    }
+
+    nav {
+      display: flex;
+      justify-content: center;
+      gap: 0;
+      background: var(--sage-dark);
+      flex-wrap: wrap;
+    }
+
+    nav button {
+      background: none;
+      border: none;
+      color: rgba(255,255,255,0.8);
+      padding: 0.8rem 1.5rem;
+      font-family: inherit;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: all 0.3s;
+      letter-spacing: 1px;
+    }
+
+    nav button:hover, nav button.active {
+      background: rgba(255,255,255,0.15);
+      color: white;
+    }
+
+    nav button.active { border-bottom: 2px solid white; }
+
+    main {
+      max-width: 750px;
+      margin: 0 auto;
+      padding: 2rem 1rem;
+    }
+
+    .section { display: none; }
+    .section.active { display: block; }
+
+    .form-group { margin-bottom: 1.2rem; }
+
+    label {
+      display: block;
+      margin-bottom: 0.4rem;
+      color: var(--text-light);
+      font-size: 0.9rem;
+    }
+
+    input[type="text"],
+    input[type="email"],
+    input[type="password"],
+    input[type="date"],
+    textarea {
+      width: 100%;
+      padding: 0.8rem 1rem;
+      border: 1px solid var(--warm);
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 1rem;
+      background: var(--cream);
+      transition: border-color 0.3s;
+    }
+
+    textarea { min-height: 120px; resize: vertical; }
+    input:focus, textarea:focus { outline: none; border-color: var(--sage); }
+
+    .btn {
+      background: var(--sage);
+      color: white;
+      border: none;
+      padding: 0.8rem 1.5rem;
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: background 0.3s;
+      letter-spacing: 0.5px;
+    }
+
+    .btn:hover { background: var(--sage-dark); }
+    .btn-full { width: 100%; }
+    .btn-sm { padding: 0.5rem 1rem; font-size: 0.85rem; }
+
+    .alert {
+      padding: 1rem;
+      border-radius: 8px;
+      margin-bottom: 1rem;
+      display: none;
+      font-size: 0.95rem;
+    }
+
+    .alert.success { background: #E8F5E9; color: #2E7D32; border: 1px solid #C8E6C9; }
+    .alert.error { background: #FFEBEE; color: #C62828; border: 1px solid #FFCDD2; }
+    .alert.show { display: block; }
+
+    /* Tables */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+    }
+
+    th {
+      text-align: left;
+      padding: 0.6rem 0.8rem;
+      border-bottom: 2px solid var(--warm);
+      color: var(--sage-dark);
+      font-weight: 600;
+    }
+
+    td {
+      padding: 0.6rem 0.8rem;
+      border-bottom: 1px solid var(--warm);
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 0.2rem 0.6rem;
+      border-radius: 12px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+
+    .badge-active { background: #E8F5E9; color: #2E7D32; }
+    .badge-inactive { background: #FFF3E0; color: #E65100; }
+
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .stat-card {
+      background: white;
+      border-radius: 12px;
+      padding: 1.5rem;
+      text-align: center;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    }
+
+    .stat-card .number {
+      font-size: 2rem;
+      color: var(--sage-dark);
+      font-weight: 600;
+    }
+
+    .stat-card .label {
+      color: var(--text-light);
+      font-size: 0.85rem;
+    }
+
+    .message-item {
+      padding: 1rem 0;
+      border-bottom: 1px solid var(--warm);
+    }
+
+    .message-item:last-child { border-bottom: none; }
+    .message-item .subject { font-weight: 600; color: var(--sage-dark); }
+    .message-item .date { font-size: 0.8rem; color: var(--text-light); }
+    .message-item .body { margin-top: 0.3rem; font-size: 0.9rem; }
+
+    .date-picker-row {
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+
+    .date-picker-row input { flex: 1; }
+
+    .logout-btn {
+      position: absolute;
+      top: 1.5rem;
+      right: 1.5rem;
+      background: rgba(255,255,255,0.2);
+      color: white;
+      border: 1px solid rgba(255,255,255,0.3);
+      padding: 0.4rem 1rem;
+      border-radius: 6px;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 0.85rem;
+    }
+
+    header { position: relative; }
+
+    @media (max-width: 600px) {
+      .stat-grid { grid-template-columns: 1fr 1fr; }
+      nav button { padding: 0.7rem 1rem; font-size: 0.8rem; }
+      table { font-size: 0.8rem; }
+      td, th { padding: 0.4rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Serena's Yoga</h1>
+    <p>Admin Dashboard</p>
+    <button class="logout-btn" id="logoutBtn" style="display:none" onclick="logout()">Log Out</button>
+  </header>
+
+  <!-- Login -->
+  <div id="loginScreen">
+    <div class="card">
+      <h2>Admin Login</h2>
+      <div id="loginAlert" class="alert"></div>
+      <form onsubmit="login(event)">
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" id="loginPassword" required placeholder="Enter admin password">
+        </div>
+        <button type="submit" class="btn btn-full">Log In</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Admin Panel -->
+  <div id="adminPanel">
+    <nav>
+      <button class="active" onclick="showSection('dashboard', this)">Dashboard</button>
+      <button onclick="showSection('checkins', this)">Check-Ins</button>
+      <button onclick="showSection('subscribers', this)">Subscribers</button>
+      <button onclick="showSection('sendMessage', this)">Send Update</button>
+      <button onclick="showSection('settings', this)">Settings</button>
+    </nav>
+
+    <main>
+      <!-- Dashboard -->
+      <div id="dashboard" class="section active">
+        <div class="stat-grid">
+          <div class="stat-card">
+            <div class="number" id="statSubscribers">-</div>
+            <div class="label">Subscribers</div>
+          </div>
+          <div class="stat-card">
+            <div class="number" id="statTodayCheckins">-</div>
+            <div class="label">Today's Check-Ins</div>
+          </div>
+          <div class="stat-card">
+            <div class="number" id="statMessages">-</div>
+            <div class="label">Messages Sent</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2>Recent Check-In History</h2>
+          <table>
+            <thead><tr><th>Date</th><th>Attendees</th></tr></thead>
+            <tbody id="historyTable"><tr><td colspan="2">Loading...</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Check-Ins -->
+      <div id="checkins" class="section">
+        <div class="card">
+          <h2>Class Check-Ins</h2>
+          <div class="date-picker-row">
+            <input type="date" id="checkinDate" value="">
+            <button class="btn btn-sm" onclick="loadCheckins()">View</button>
+          </div>
+          <p style="margin-bottom:1rem; color:var(--text-light);" id="checkinCount">Select a date to view check-ins</p>
+          <table>
+            <thead><tr><th>Name</th><th>Email</th><th>Time</th></tr></thead>
+            <tbody id="checkinTable"><tr><td colspan="3">No check-ins yet</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Subscribers -->
+      <div id="subscribers" class="section">
+        <div class="card">
+          <h2>All Subscribers</h2>
+          <table>
+            <thead><tr><th>Name</th><th>Email</th><th>Status</th><th>Joined</th></tr></thead>
+            <tbody id="subscriberTable"><tr><td colspan="4">Loading...</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Send Message -->
+      <div id="sendMessage" class="section">
+        <div class="card">
+          <h2>Send Update to Subscribers</h2>
+          <p style="margin-bottom:1rem; color:var(--text-light);">
+            This will send an update to all active subscribers.
+          </p>
+          <div id="messageAlert" class="alert"></div>
+          <form onsubmit="sendMessage(event)">
+            <div class="form-group">
+              <label>Subject</label>
+              <input type="text" id="msgSubject" required placeholder="e.g., Class Cancelled This Monday">
+            </div>
+            <div class="form-group">
+              <label>Message</label>
+              <textarea id="msgBody" required placeholder="Write your update here..."></textarea>
+            </div>
+            <button type="submit" class="btn btn-full">Send Update</button>
+          </form>
+        </div>
+
+        <div class="card">
+          <h2>Message History</h2>
+          <div id="messageHistory">Loading...</div>
+        </div>
+      </div>
+
+      <!-- Settings -->
+      <div id="settings" class="section">
+        <div class="card">
+          <h2>Class Settings</h2>
+          <div id="settingsAlert" class="alert"></div>
+          <form onsubmit="saveSettings(event)">
+            <div class="form-group">
+              <label>Class Time</label>
+              <input type="text" id="setTime" placeholder="e.g., 9:00 AM">
+            </div>
+            <div class="form-group">
+              <label>Duration (minutes)</label>
+              <input type="text" id="setDuration" placeholder="e.g., 60">
+            </div>
+            <div class="form-group">
+              <label>Location</label>
+              <input type="text" id="setLocation" placeholder="e.g., Studio Name">
+            </div>
+            <button type="submit" class="btn btn-full">Save Settings</button>
+          </form>
+        </div>
+
+        <div class="card">
+          <h2>Change Admin Password</h2>
+          <div id="passwordAlert" class="alert"></div>
+          <form onsubmit="changePassword(event)">
+            <div class="form-group">
+              <label>New Password</label>
+              <input type="password" id="newPassword" required minlength="6" placeholder="At least 6 characters">
+            </div>
+            <button type="submit" class="btn btn-full">Update Password</button>
+          </form>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    let adminPassword = '';
+
+    function authHeaders() {
+      return {
+        'Content-Type': 'application/json',
+        'X-Admin-Password': adminPassword
+      };
+    }
+
+    function showAlert(id, msg, type) {
+      const el = document.getElementById(id);
+      el.textContent = msg;
+      el.className = `alert ${type} show`;
+      setTimeout(() => el.classList.remove('show'), 5000);
+    }
+
+    function showSection(id, btn) {
+      document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+      document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+      if (btn) btn.classList.add('active');
+
+      if (id === 'dashboard') loadDashboard();
+      if (id === 'checkins') loadCheckins();
+      if (id === 'subscribers') loadSubscribers();
+      if (id === 'sendMessage') loadMessages();
+      if (id === 'settings') loadSettings();
+    }
+
+    // Login
+    async function login(e) {
+      e.preventDefault();
+      adminPassword = document.getElementById('loginPassword').value;
+
+      try {
+        const res = await fetch('/api/admin/subscribers', { headers: authHeaders() });
+        if (res.ok) {
+          document.getElementById('loginScreen').style.display = 'none';
+          document.getElementById('adminPanel').style.display = 'block';
+          document.getElementById('logoutBtn').style.display = 'block';
+          loadDashboard();
+        } else {
+          showAlert('loginAlert', 'Invalid password', 'error');
+          adminPassword = '';
+        }
+      } catch (err) {
+        showAlert('loginAlert', 'Connection error', 'error');
+      }
+    }
+
+    function logout() {
+      adminPassword = '';
+      document.getElementById('loginScreen').style.display = 'block';
+      document.getElementById('adminPanel').style.display = 'none';
+      document.getElementById('logoutBtn').style.display = 'none';
+      document.getElementById('loginPassword').value = '';
+    }
+
+    // Dashboard
+    async function loadDashboard() {
+      try {
+        const [subsRes, checkinsRes, msgsRes, historyRes] = await Promise.all([
+          fetch('/api/admin/subscribers', { headers: authHeaders() }),
+          fetch('/api/admin/checkins', { headers: authHeaders() }),
+          fetch('/api/admin/messages', { headers: authHeaders() }),
+          fetch('/api/admin/checkins-history', { headers: authHeaders() })
+        ]);
+
+        const subs = await subsRes.json();
+        const checkins = await checkinsRes.json();
+        const msgs = await msgsRes.json();
+        const history = await historyRes.json();
+
+        document.getElementById('statSubscribers').textContent = subs.filter(s => s.subscribed).length;
+        document.getElementById('statTodayCheckins').textContent = checkins.count;
+        document.getElementById('statMessages').textContent = msgs.length;
+
+        const historyTable = document.getElementById('historyTable');
+        if (history.length === 0) {
+          historyTable.innerHTML = '<tr><td colspan="2">No check-ins yet</td></tr>';
+        } else {
+          historyTable.innerHTML = history.map(h => `
+            <tr><td>${formatDate(h.class_date)}</td><td>${h.count}</td></tr>
+          `).join('');
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    // Check-ins
+    async function loadCheckins() {
+      const dateInput = document.getElementById('checkinDate');
+      if (!dateInput.value) dateInput.value = new Date().toISOString().split('T')[0];
+
+      try {
+        const res = await fetch(`/api/admin/checkins?date=${dateInput.value}`, { headers: authHeaders() });
+        const data = await res.json();
+
+        document.getElementById('checkinCount').textContent = `${data.count} student(s) checked in on ${formatDate(data.date)}`;
+
+        const table = document.getElementById('checkinTable');
+        if (data.checkins.length === 0) {
+          table.innerHTML = '<tr><td colspan="3">No check-ins for this date</td></tr>';
+        } else {
+          table.innerHTML = data.checkins.map(c => `
+            <tr><td>${esc(c.name)}</td><td>${esc(c.email)}</td><td>${formatTime(c.checked_in_at)}</td></tr>
+          `).join('');
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    // Subscribers
+    async function loadSubscribers() {
+      try {
+        const res = await fetch('/api/admin/subscribers', { headers: authHeaders() });
+        const subs = await res.json();
+
+        const table = document.getElementById('subscriberTable');
+        if (subs.length === 0) {
+          table.innerHTML = '<tr><td colspan="4">No subscribers yet</td></tr>';
+        } else {
+          table.innerHTML = subs.map(s => `
+            <tr>
+              <td>${esc(s.name)}</td>
+              <td>${esc(s.email)}</td>
+              <td><span class="badge ${s.subscribed ? 'badge-active' : 'badge-inactive'}">${s.subscribed ? 'Active' : 'Unsubscribed'}</span></td>
+              <td>${formatDate(s.created_at)}</td>
+            </tr>
+          `).join('');
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    // Send message
+    async function sendMessage(e) {
+      e.preventDefault();
+      const subject = document.getElementById('msgSubject').value.trim();
+      const body = document.getElementById('msgBody').value.trim();
+
+      if (!confirm(`Send this update to all subscribers?\n\nSubject: ${subject}`)) return;
+
+      try {
+        const res = await fetch('/api/admin/send-message', {
+          method: 'POST',
+          headers: authHeaders(),
+          body: JSON.stringify({ subject, body })
+        });
+        const data = await res.json();
+        if (res.ok) {
+          showAlert('messageAlert', `${data.message}`, 'success');
+          document.getElementById('msgSubject').value = '';
+          document.getElementById('msgBody').value = '';
+          loadMessages();
+        } else {
+          showAlert('messageAlert', data.error, 'error');
+        }
+      } catch (err) {
+        showAlert('messageAlert', 'Failed to send', 'error');
+      }
+    }
+
+    // Load messages
+    async function loadMessages() {
+      try {
+        const res = await fetch('/api/admin/messages', { headers: authHeaders() });
+        const msgs = await res.json();
+
+        const container = document.getElementById('messageHistory');
+        if (msgs.length === 0) {
+          container.innerHTML = '<p style="color:var(--text-light)">No messages sent yet.</p>';
+        } else {
+          container.innerHTML = msgs.map(m => `
+            <div class="message-item">
+              <div class="subject">${esc(m.subject)}</div>
+              <div class="date">${formatDate(m.sent_at)}</div>
+              <div class="body">${esc(m.body)}</div>
+            </div>
+          `).join('');
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    // Settings
+    async function loadSettings() {
+      try {
+        const res = await fetch('/api/class-info');
+        const info = await res.json();
+        document.getElementById('setTime').value = info.class_time || '';
+        document.getElementById('setDuration').value = info.class_duration || '';
+        document.getElementById('setLocation').value = info.class_location || '';
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    async function saveSettings(e) {
+      e.preventDefault();
+      try {
+        const res = await fetch('/api/admin/settings', {
+          method: 'PUT',
+          headers: authHeaders(),
+          body: JSON.stringify({
+            class_time: document.getElementById('setTime').value,
+            class_duration: document.getElementById('setDuration').value,
+            class_location: document.getElementById('setLocation').value
+          })
+        });
+        const data = await res.json();
+        showAlert('settingsAlert', data.message, res.ok ? 'success' : 'error');
+      } catch (err) {
+        showAlert('settingsAlert', 'Failed to save', 'error');
+      }
+    }
+
+    async function changePassword(e) {
+      e.preventDefault();
+      try {
+        const res = await fetch('/api/admin/password', {
+          method: 'PUT',
+          headers: authHeaders(),
+          body: JSON.stringify({ new_password: document.getElementById('newPassword').value })
+        });
+        const data = await res.json();
+        if (res.ok) {
+          adminPassword = document.getElementById('newPassword').value;
+          showAlert('passwordAlert', data.message, 'success');
+          document.getElementById('newPassword').value = '';
+        } else {
+          showAlert('passwordAlert', data.error, 'error');
+        }
+      } catch (err) {
+        showAlert('passwordAlert', 'Failed to update', 'error');
+      }
+    }
+
+    // Helpers
+    function esc(str) {
+      const div = document.createElement('div');
+      div.textContent = str;
+      return div.innerHTML;
+    }
+
+    function formatDate(str) {
+      if (!str) return '';
+      const d = new Date(str);
+      return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    }
+
+    function formatTime(str) {
+      if (!str) return '';
+      const d = new Date(str);
+      return d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+    }
+  </script>
+</body>
+</html>

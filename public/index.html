@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Serena's Yoga</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --sage: #87A878;
+      --sage-light: #B5C9A8;
+      --sage-dark: #5C7A4E;
+      --cream: #FAF8F0;
+      --warm: #E8DFD0;
+      --text: #3A3A3A;
+      --text-light: #6B6B6B;
+    }
+
+    body {
+      font-family: 'Georgia', 'Times New Roman', serif;
+      background: var(--cream);
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    /* Header */
+    header {
+      background: linear-gradient(135deg, var(--sage-dark), var(--sage));
+      color: white;
+      text-align: center;
+      padding: 3rem 1rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    header::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(255,255,255,0.05) 0%, transparent 60%);
+    }
+
+    header h1 {
+      font-size: 2.8rem;
+      font-weight: 300;
+      letter-spacing: 3px;
+      margin-bottom: 0.3rem;
+    }
+
+    header p {
+      font-size: 1.1rem;
+      opacity: 0.9;
+      font-style: italic;
+      letter-spacing: 1px;
+    }
+
+    /* Lotus decoration */
+    .lotus {
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+      display: block;
+    }
+
+    /* Navigation */
+    nav {
+      display: flex;
+      justify-content: center;
+      gap: 0;
+      background: var(--sage-dark);
+      flex-wrap: wrap;
+    }
+
+    nav button {
+      background: none;
+      border: none;
+      color: rgba(255,255,255,0.8);
+      padding: 1rem 2rem;
+      font-family: inherit;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: all 0.3s;
+      letter-spacing: 1px;
+    }
+
+    nav button:hover, nav button.active {
+      background: rgba(255,255,255,0.15);
+      color: white;
+    }
+
+    nav button.active {
+      border-bottom: 2px solid white;
+    }
+
+    /* Main content */
+    main {
+      max-width: 700px;
+      margin: 0 auto;
+      padding: 2rem 1rem;
+    }
+
+    .section {
+      display: none;
+    }
+
+    .section.active {
+      display: block;
+    }
+
+    /* Cards */
+    .card {
+      background: white;
+      border-radius: 12px;
+      padding: 2rem;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    }
+
+    .card h2 {
+      font-size: 1.5rem;
+      font-weight: 400;
+      color: var(--sage-dark);
+      margin-bottom: 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--warm);
+    }
+
+    /* Schedule */
+    .schedule-item {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      padding: 1rem 0;
+    }
+
+    .schedule-day {
+      background: var(--sage);
+      color: white;
+      padding: 0.8rem 1.2rem;
+      border-radius: 8px;
+      text-align: center;
+      min-width: 90px;
+    }
+
+    .schedule-day .day-name {
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
+
+    .schedule-day .day-sub {
+      font-size: 0.75rem;
+      opacity: 0.9;
+    }
+
+    .schedule-details h3 {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .schedule-details p {
+      color: var(--text-light);
+      font-size: 0.95rem;
+    }
+
+    /* Forms */
+    .form-group {
+      margin-bottom: 1.2rem;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 0.4rem;
+      color: var(--text-light);
+      font-size: 0.9rem;
+      letter-spacing: 0.5px;
+    }
+
+    input[type="text"],
+    input[type="email"] {
+      width: 100%;
+      padding: 0.8rem 1rem;
+      border: 1px solid var(--warm);
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 1rem;
+      background: var(--cream);
+      transition: border-color 0.3s;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: var(--sage);
+    }
+
+    .btn {
+      background: var(--sage);
+      color: white;
+      border: none;
+      padding: 0.9rem 2rem;
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background 0.3s;
+      letter-spacing: 0.5px;
+      width: 100%;
+    }
+
+    .btn:hover {
+      background: var(--sage-dark);
+    }
+
+    .btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    /* Alert messages */
+    .alert {
+      padding: 1rem;
+      border-radius: 8px;
+      margin-bottom: 1rem;
+      display: none;
+      font-size: 0.95rem;
+    }
+
+    .alert.success {
+      background: #E8F5E9;
+      color: #2E7D32;
+      border: 1px solid #C8E6C9;
+    }
+
+    .alert.error {
+      background: #FFEBEE;
+      color: #C62828;
+      border: 1px solid #FFCDD2;
+    }
+
+    .alert.show {
+      display: block;
+    }
+
+    /* Next class banner */
+    .next-class {
+      background: linear-gradient(135deg, var(--sage), var(--sage-light));
+      color: white;
+      padding: 1.5rem 2rem;
+      border-radius: 12px;
+      margin-bottom: 1.5rem;
+      text-align: center;
+    }
+
+    .next-class .label {
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      opacity: 0.9;
+    }
+
+    .next-class .date {
+      font-size: 1.4rem;
+      margin: 0.3rem 0;
+    }
+
+    .next-class .time {
+      font-size: 1rem;
+      opacity: 0.9;
+    }
+
+    /* Footer */
+    footer {
+      text-align: center;
+      padding: 2rem;
+      color: var(--text-light);
+      font-size: 0.85rem;
+      border-top: 1px solid var(--warm);
+      margin-top: 2rem;
+    }
+
+    /* Unsubscribe link */
+    .unsub-link {
+      text-align: center;
+      margin-top: 1rem;
+    }
+
+    .unsub-link a {
+      color: var(--text-light);
+      font-size: 0.85rem;
+      cursor: pointer;
+      text-decoration: underline;
+    }
+
+    @media (max-width: 600px) {
+      header h1 { font-size: 2rem; }
+      nav button { padding: 0.8rem 1.2rem; font-size: 0.85rem; }
+      .schedule-item { flex-direction: column; align-items: flex-start; gap: 0.8rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <span class="lotus">&#x1F33F;</span>
+    <h1>Serena's Yoga</h1>
+    <p>Find your balance</p>
+  </header>
+
+  <nav>
+    <button class="active" onclick="showSection('schedule')">Schedule</button>
+    <button onclick="showSection('checkin')">Check In</button>
+    <button onclick="showSection('subscribe')">Subscribe</button>
+  </nav>
+
+  <main>
+    <!-- Schedule Section -->
+    <div id="schedule" class="section active">
+      <div class="next-class" id="nextClassBanner">
+        <div class="label">Next Class</div>
+        <div class="date" id="nextClassDate">Loading...</div>
+        <div class="time" id="nextClassTime"></div>
+      </div>
+
+      <div class="card">
+        <h2>Weekly Class</h2>
+        <div class="schedule-item">
+          <div class="schedule-day">
+            <div class="day-name">Monday</div>
+            <div class="day-sub">Weekly</div>
+          </div>
+          <div class="schedule-details">
+            <h3 id="classTimeDisplay">Loading...</h3>
+            <p id="classDurationDisplay"></p>
+            <p id="classLocationDisplay"></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>What to Bring</h2>
+        <p>Yoga mat, water bottle, and comfortable clothing. Blocks and straps are available at the studio. All levels welcome!</p>
+      </div>
+    </div>
+
+    <!-- Check In Section -->
+    <div id="checkin" class="section">
+      <div class="card">
+        <h2>Class Check-In</h2>
+        <p style="margin-bottom: 1.2rem; color: var(--text-light);">
+          Checking in for today's Monday class? Enter your details below.
+        </p>
+        <div id="checkinAlert" class="alert"></div>
+        <form id="checkinForm" onsubmit="handleCheckin(event)">
+          <div class="form-group">
+            <label>Your Name</label>
+            <input type="text" id="checkinName" required placeholder="Enter your name">
+          </div>
+          <div class="form-group">
+            <label>Email</label>
+            <input type="email" id="checkinEmail" required placeholder="Enter your email">
+          </div>
+          <button type="submit" class="btn" id="checkinBtn">Check In</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Subscribe Section -->
+    <div id="subscribe" class="section">
+      <div class="card">
+        <h2>Stay Updated</h2>
+        <p style="margin-bottom: 1.2rem; color: var(--text-light);">
+          Subscribe to receive class updates, schedule changes, and news from Serena.
+        </p>
+        <div id="subscribeAlert" class="alert"></div>
+        <form id="subscribeForm" onsubmit="handleSubscribe(event)">
+          <div class="form-group">
+            <label>Your Name</label>
+            <input type="text" id="subName" required placeholder="Enter your name">
+          </div>
+          <div class="form-group">
+            <label>Email</label>
+            <input type="email" id="subEmail" required placeholder="Enter your email">
+          </div>
+          <button type="submit" class="btn" id="subBtn">Subscribe</button>
+        </form>
+        <div class="unsub-link">
+          <a onclick="showUnsubscribe()">Want to unsubscribe?</a>
+        </div>
+      </div>
+
+      <!-- Hidden unsubscribe form -->
+      <div class="card" id="unsubCard" style="display:none;">
+        <h2>Unsubscribe</h2>
+        <div id="unsubAlert" class="alert"></div>
+        <form onsubmit="handleUnsubscribe(event)">
+          <div class="form-group">
+            <label>Email</label>
+            <input type="email" id="unsubEmail" required placeholder="Enter your email">
+          </div>
+          <button type="submit" class="btn" style="background: #999;">Unsubscribe</button>
+        </form>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    &copy; 2026 Serena's Yoga. Namaste.
+  </footer>
+
+  <script>
+    // Navigation
+    function showSection(id) {
+      document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+      document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+      event.target.classList.add('active');
+    }
+
+    // Show alert
+    function showAlert(elementId, message, type) {
+      const el = document.getElementById(elementId);
+      el.textContent = message;
+      el.className = `alert ${type} show`;
+      setTimeout(() => el.classList.remove('show'), 5000);
+    }
+
+    // Load class info
+    async function loadClassInfo() {
+      try {
+        const res = await fetch('/api/class-info');
+        const info = await res.json();
+
+        document.getElementById('classTimeDisplay').textContent = info.class_time;
+        document.getElementById('classDurationDisplay').textContent = `${info.class_duration} minutes`;
+        document.getElementById('classLocationDisplay').textContent = info.class_location;
+
+        // Calculate next Monday
+        const now = new Date();
+        const dayOfWeek = now.getDay();
+        const daysUntilMonday = dayOfWeek === 0 ? 1 : dayOfWeek === 1 ? 0 : 8 - dayOfWeek;
+        const nextMonday = new Date(now);
+        nextMonday.setDate(now.getDate() + daysUntilMonday);
+
+        const options = { weekday: 'long', month: 'long', day: 'numeric' };
+        document.getElementById('nextClassDate').textContent = nextMonday.toLocaleDateString('en-US', options);
+        document.getElementById('nextClassTime').textContent = `${info.class_time} \u2022 ${info.class_duration} min \u2022 ${info.class_location}`;
+      } catch (err) {
+        console.error('Failed to load class info', err);
+      }
+    }
+
+    // Check in
+    async function handleCheckin(e) {
+      e.preventDefault();
+      const name = document.getElementById('checkinName').value.trim();
+      const email = document.getElementById('checkinEmail').value.trim();
+
+      try {
+        const res = await fetch('/api/checkin', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, email })
+        });
+        const data = await res.json();
+        if (res.ok) {
+          showAlert('checkinAlert', data.message, 'success');
+          document.getElementById('checkinForm').reset();
+        } else {
+          showAlert('checkinAlert', data.error, 'error');
+        }
+      } catch (err) {
+        showAlert('checkinAlert', 'Something went wrong. Please try again.', 'error');
+      }
+    }
+
+    // Subscribe
+    async function handleSubscribe(e) {
+      e.preventDefault();
+      const name = document.getElementById('subName').value.trim();
+      const email = document.getElementById('subEmail').value.trim();
+
+      try {
+        const res = await fetch('/api/subscribe', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, email })
+        });
+        const data = await res.json();
+        if (res.ok) {
+          showAlert('subscribeAlert', data.message, 'success');
+          document.getElementById('subscribeForm').reset();
+        } else {
+          showAlert('subscribeAlert', data.error, 'error');
+        }
+      } catch (err) {
+        showAlert('subscribeAlert', 'Something went wrong. Please try again.', 'error');
+      }
+    }
+
+    // Unsubscribe
+    function showUnsubscribe() {
+      document.getElementById('unsubCard').style.display = 'block';
+    }
+
+    async function handleUnsubscribe(e) {
+      e.preventDefault();
+      const email = document.getElementById('unsubEmail').value.trim();
+
+      try {
+        const res = await fetch('/api/unsubscribe', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email })
+        });
+        const data = await res.json();
+        showAlert('unsubAlert', data.message, 'success');
+      } catch (err) {
+        showAlert('unsubAlert', 'Something went wrong.', 'error');
+      }
+    }
+
+    // Init
+    loadClassInfo();
+  </script>
+</body>
+</html>
