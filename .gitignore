@@ -5,3 +5,7 @@ node_modules/
 serena_yoga.db*
 .vercel
 .env*.local
+
+# local migration backup (contains PII + admin password — keep OFF public repo)
+.supabase-backup/
+CLAUDE.md
